@@ -1,0 +1,38 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: bank-postgres
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: 12345
+      POSTGRES_DB: bank
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U root -d bank"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  bank-app:
+    image: eclipse-temurin:21-jdk-jammy
+    container_name: bank-app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/bank
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: 12345
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./target/Bank-1.0-SNAPSHOT.war:/app/app.jar
+    working_dir: /app
+    command: ["java", "-jar", "app.jar"]
+
+volumes:
+  postgres_data:

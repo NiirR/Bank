@@ -1,4 +1,18 @@
-FROM ubuntu:latest
-LABEL authors="NiiR"
+FROM postgres:15
 
-ENTRYPOINT ["top", "-b"]
+ENV POSTGRES_USER=root
+ENV POSTGRES_PASSWORD=12345
+ENV POSTGRES_DB=bank
+
+EXPOSE 5432
+
+FROM eclipse-temurin:21-jdk-jammy
+WORKDIR /app
+COPY target/Bank-1.0-SNAPSHOT.war app.jar
+
+ENV SPRING_DATASOURCE_URL=jdbc:postgresql://host.docker.internal:5432/bank
+ENV SPRING_DATASOURCE_USERNAME=root
+ENV SPRING_DATASOURCE_PASSWORD=12345
+
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar"]
