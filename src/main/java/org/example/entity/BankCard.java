@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(schema = "bank", name = "bank_cards")
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
